@@ -10,7 +10,13 @@ hablante de español promedio reconoce sin dudar. Evitamos:
     excesiva complica la evaluación, aunque un poco de ambigüedad es
     parte natural del juego)
 
-Esta lista es un punto de partida (~150 palabras) inspirada en las
+IMPORTANTE: estas palabras llevan tildes correctas donde corresponde.
+Se comprobó que sin tilde, algunas palabras (ej. "leon" vs "león") dan
+vectores de embedding muy distintos o de mala calidad -- el modelo las
+trata como si fueran otra palabra (o una desconocida), no como una
+variante ortográfica de la misma. Por eso mantenemos la ortografía real.
+
+Esta lista es un punto de partida (~180 palabras) inspirada en las
 categorías del Codenames original: animales, objetos cotidianos,
 lugares, naturaleza, tecnología, cuerpo humano, comida, etc.
 Se puede (y conviene) ampliar con el tiempo.
@@ -18,44 +24,44 @@ Se puede (y conviene) ampliar con el tiempo.
 
 VOCABULARIO_TABLERO = [
     # Animales
-    "gato", "perro", "caballo", "elefante", "leon", "tigre", "oso", "lobo",
-    "aguila", "serpiente", "araña", "abeja", "ballena", "tiburon", "delfin",
-    "pulpo", "rana", "mono", "conejo", "raton", "vaca", "cerdo", "oveja",
-    "gallina", "pato", "pinguino", "cocodrilo", "camaleon", "murcielago",
+    "gato", "perro", "caballo", "elefante", "león", "tigre", "oso", "lobo",
+    "águila", "serpiente", "araña", "abeja", "ballena", "tiburón", "delfín",
+    "pulpo", "rana", "mono", "conejo", "ratón", "vaca", "cerdo", "oveja",
+    "gallina", "pato", "pingüino", "cocodrilo", "camaleón", "murciélago",
 
     # Objetos cotidianos / muebles
-    "silla", "mesa", "sofa", "cama", "lampara", "espejo", "reloj", "puerta",
-    "ventana", "libro", "lapiz", "papel", "telefono", "computadora", "television",
-    "camara", "llave", "tijera", "cepillo", "jabon", "toalla", "paraguas",
+    "silla", "mesa", "sofá", "cama", "lámpara", "espejo", "reloj", "puerta",
+    "ventana", "libro", "lápiz", "papel", "teléfono", "computadora", "televisión",
+    "cámara", "llave", "tijera", "cepillo", "jabón", "toalla", "paraguas",
     "mochila", "maleta", "cartera", "anillo", "collar",
 
     # Lugares
-    "playa", "montana", "bosque", "desierto", "isla", "rio", "lago", "oceano",
+    "playa", "montaña", "bosque", "desierto", "isla", "río", "lago", "océano",
     "ciudad", "pueblo", "castillo", "iglesia", "escuela", "hospital", "aeropuerto",
-    "estacion", "puente", "torre", "jardin", "parque", "granja", "cueva",
-    "volcan", "selva",
+    "estación", "puente", "torre", "jardín", "parque", "granja", "cueva",
+    "volcán", "selva",
 
     # Naturaleza / clima
     "sol", "luna", "estrella", "planeta", "nube", "lluvia", "nieve", "viento",
-    "trueno", "arcoiris", "fuego", "hielo", "arena", "roca", "flor", "arbol",
-    "hoja", "semilla", "raiz",
+    "trueno", "arcoíris", "fuego", "hielo", "arena", "roca", "flor", "árbol",
+    "hoja", "semilla", "raíz",
 
     # Tecnología / transporte
-    "robot", "cohete", "satelite", "barco", "submarino", "avion", "tren",
-    "motocicleta", "helicoptero", "globo",
+    "robot", "cohete", "satélite", "barco", "submarino", "avión", "tren",
+    "motocicleta", "helicóptero", "globo",
 
     # Cuerpo humano
-    "mano", "pie", "ojo", "oreja", "corazon", "cerebro", "hueso", "sangre",
+    "mano", "pie", "ojo", "oreja", "corazón", "cerebro", "hueso", "sangre",
     "diente", "cabello",
 
     # Comida
-    "manzana", "banana", "naranja", "uva", "fresa", "limon", "pan", "queso",
-    "leche", "huevo", "arroz", "sopa", "pastel", "chocolate", "cafe", "te",
-    "azucar", "sal", "miel",
+    "manzana", "banana", "naranja", "uva", "fresa", "limón", "pan", "queso",
+    "leche", "huevo", "arroz", "sopa", "pastel", "chocolate", "café", "té",
+    "azúcar", "sal", "miel",
 
     # Profesiones / personas
-    "medico", "maestro", "policia", "bombero", "piloto", "cocinero", "artista",
-    "musico", "cientifico", "granjero", "rey", "reina", "princesa", "pirata",
+    "médico", "maestro", "policía", "bombero", "piloto", "cocinero", "artista",
+    "músico", "científico", "granjero", "rey", "reina", "princesa", "pirata",
     "soldado", "mago",
 
     # Deportes / juegos
@@ -63,10 +69,10 @@ VOCABULARIO_TABLERO = [
     "carta", "ajedrez",
 
     # Música / arte
-    "guitarra", "piano", "tambor", "violin", "pincel", "pintura", "escultura",
+    "guitarra", "piano", "tambor", "violín", "pincel", "pintura", "escultura",
 
     # Fantasía / mitología
-    "dragon", "fantasma", "vampiro", "bruja", "hada", "monstruo", "gigante",
+    "dragón", "fantasma", "vampiro", "bruja", "hada", "monstruo", "gigante",
     "unicornio", "sirena",
 ]
 

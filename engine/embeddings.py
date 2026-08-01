@@ -91,6 +91,83 @@ class EmbeddingStore:
         store._compute_norms()
         return store
 
+    @classmethod
+    def from_spacy_model(
+        cls,
+        model_name: str = "es_core_news_md",
+        palabras_incluir: Iterable[str] | None = None,
+        lista_frecuencia_path: str | Path | None = None,
+        max_candidatas: int = 30_000,
+    ) -> "EmbeddingStore":
+        """
+        Carga embeddings usando un modelo de spaCy (por defecto, el de
+        español "es_core_news_md") para obtener los VECTORES, combinado
+        con una lista de frecuencia de palabras reales en español para
+        saber QUÉ palabras probar como candidatas (el vocabulario interno
+        de spaCy no sirve para esto -- solo contiene palabras ya "tocadas",
+        no una lista completa del idioma).
+
+        Args:
+            model_name: nombre del modelo de spaCy ya instalado
+            palabras_incluir: palabras que SIEMPRE se incluyen (típicamente
+                el vocabulario del tablero), aunque no estén en la lista
+                de frecuencia o no figuren entre las primeras `max_candidatas`
+            lista_frecuencia_path: ruta a un archivo de texto con formato
+                "palabra frecuencia" por línea, ordenado de más a menos
+                frecuente (ej. hermitdave/FrequencyWords). Si no se pasa,
+                solo se cargan las `palabras_incluir`.
+            max_candidatas: cuántas palabras tomar de la lista de frecuencia
+        """
+        import spacy
+
+        nlp = spacy.load(model_name)
+        store = cls()
+
+        words: list[str] = []
+        vectors: list[np.ndarray] = []
+        vistas: set[str] = set()
+
+        def agregar(palabra: str) -> None:
+            clave = palabra.lower()
+            if clave in vistas:
+                return
+            lex = nlp.vocab[clave]
+            if not lex.has_vector or lex.vector_norm == 0:
+                return
+            vistas.add(clave)
+            words.append(clave)
+            vectors.append(np.asarray(lex.vector, dtype=np.float32))
+
+        if palabras_incluir:
+            for p in palabras_incluir:
+                agregar(p)
+
+        if lista_frecuencia_path:
+            path = Path(lista_frecuencia_path)
+            candidatas_agregadas = 0
+            with path.open("r", encoding="utf-8", errors="ignore") as f:
+                for line in f:
+                    if candidatas_agregadas >= max_candidatas:
+                        break
+                    parts = line.rstrip().split(" ")
+                    if not parts:
+                        continue
+                    palabra = parts[0]
+                    if not _WORD_RE.match(palabra):
+                        continue
+                    antes = len(words)
+                    agregar(palabra)
+                    if len(words) > antes:
+                        candidatas_agregadas += 1
+
+        store.words = words
+        store.word_to_idx = {w: i for i, w in enumerate(words)}
+        store.vectors = np.vstack(vectors) if vectors else np.zeros((0, 0))
+        store._compute_norms()
+        return store
+
+
+
     def _compute_norms(self):
         if self.vectors is not None and len(self.vectors) > 0:
             self._norms = np.linalg.norm(self.vectors, axis=1)
