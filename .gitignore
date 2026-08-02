@@ -1,0 +1,14 @@
+# Entorno virtual de Python
+venv/
+
+# Archivos compilados de Python
+__pycache__/
+*.pyc
+
+# Datos descargados (pesados, se regeneran con los scripts de scripts/)
+data/embeddings/
+data/es_50k.txt
+data/vocabulario_pistas.txt
+
+# Editor
+.vscode/

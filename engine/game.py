@@ -122,3 +122,7 @@ class Partida:
 
     def en_curso(self) -> bool:
         return self.resultado == Resultado.EN_CURSO
+
+    @property
+    def turno_abierto(self) -> bool:
+        return self._turno_actual is not None

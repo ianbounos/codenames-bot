@@ -168,6 +168,50 @@ class EmbeddingStore:
 
 
 
+    @classmethod
+    def from_sentence_transformer(
+        cls,
+        words: list[str],
+        model_name: str = "paraphrase-multilingual-MiniLM-L12-v2",
+        batch_size: int = 64,
+    ) -> "EmbeddingStore":
+        """
+        Carga embeddings usando un modelo de sentence-transformers (una
+        red Transformer, entrenada con un enfoque y datos totalmente
+        distintos a spaCy/GloVe). Se usa como SEGUNDO modelo, para
+        cruzar contra el primero y filtrar asociaciones "raras" que un
+        solo modelo pueda alucinar (ver SpymasterBot con doble validación).
+
+        A diferencia de GloVe/spaCy (que tienen un vector fijo por
+        palabra), acá generamos el vector "al vuelo" codificando cada
+        palabra como si fuera una mini-oración. Por eso recibimos la
+        lista de palabras a codificar como argumento (no hay un archivo
+        de vectores precomputado).
+
+        Requiere: pip install sentence-transformers
+        La primera vez que se usa un modelo, se descarga desde Hugging
+        Face (puede tardar uno o dos minutos según la conexión).
+        """
+        from sentence_transformers import SentenceTransformer
+
+        modelo = SentenceTransformer(model_name)
+        store = cls()
+
+        palabras_unicas = list(dict.fromkeys(w.lower() for w in words))  # sin duplicados, orden preservado
+        vectores = modelo.encode(
+            palabras_unicas,
+            batch_size=batch_size,
+            show_progress_bar=True,
+            convert_to_numpy=True,
+        )
+
+        store.words = palabras_unicas
+        store.word_to_idx = {w: i for i, w in enumerate(palabras_unicas)}
+        store.vectors = vectores.astype(np.float32)
+        store._compute_norms()
+        return store
+
+
     def _compute_norms(self):
         if self.vectors is not None and len(self.vectors) > 0:
             self._norms = np.linalg.norm(self.vectors, axis=1)
