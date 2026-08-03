@@ -48,6 +48,10 @@ def cargar_perfiles() -> dict[str, PerfilBot]:
     store_principal = EmbeddingStore.from_spacy_model(**kwargs)
     print(f"  {len(store_principal)} palabras\n")
 
+    from engine.lemmatizador import precalentar_cache
+    precalentar_cache(store_principal.words)
+    print()
+
     def construir_sm_v1(vocab_pistas: list[str]) -> SpymasterBot:
         return SpymasterBot(
             embeddings=store_principal,
@@ -174,48 +178,9 @@ def main():
     )
     print(f"\nTotal de partidas simuladas: {len(resultados)}\n")
 
-    # Guardar CSV crudo
-    import csv
-    csv_path = RESULTADOS_DIR / "resultados_simulacion.csv"
-    with csv_path.open("w", newline="", encoding="utf-8") as f:
-        writer = csv.writer(f)
-        writer.writerow([
-            "perfil_rojo", "perfil_azul", "equipo_inicial", "ganador", "razon",
-            "equipo_toco_asesino", "turnos_totales",
-            "pistas_forzadas_rojo", "pistas_forzadas_azul", "seed",
-        ])
-        for r in resultados:
-            writer.writerow([
-                r.perfil_rojo, r.perfil_azul, r.equipo_inicial, r.ganador, r.razon,
-                r.equipo_toco_asesino, r.turnos_totales,
-                r.pistas_forzadas_rojo, r.pistas_forzadas_azul, r.seed,
-            ])
-    print(f"CSV guardado en: {csv_path}\n")
-
-    # Resumen de texto rápido en consola
-    print("=" * 60)
-    print("RESUMEN RÁPIDO")
-    print("=" * 60)
-
-    razones = Counter(r.razon for r in resultados)
-    print(f"\nCómo terminaron las partidas: {dict(razones)}")
-
-    ganadores_por_asesino = Counter(
-        r.equipo_toco_asesino for r in resultados if r.razon == "asesino"
-    )
-    print(f"Quién tocó el asesino (y por lo tanto perdió): {dict(ganadores_por_asesino)}")
-
-    gano_iniciando = sum(1 for r in resultados if r.ganador == r.equipo_inicial)
-    print(f"\nGanó el equipo que arrancó: {gano_iniciando}/{len(resultados)} "
-          f"({100*gano_iniciando/len(resultados):.1f}%)")
-
-    print(f"\nTurnos promedio por partida: "
-          f"{sum(r.turnos_totales for r in resultados)/len(resultados):.1f}")
-
-    print("\nGenerando dashboard visual...")
     sys.path.insert(0, str(Path(__file__).parent))
-    from generar_dashboard import generar_dashboard
-    generar_dashboard(resultados, list(perfiles.keys()), RESULTADOS_DIR)
+    from reportes import guardar_y_reportar
+    guardar_y_reportar(resultados, list(perfiles.keys()), RESULTADOS_DIR)
 
 
 if __name__ == "__main__":

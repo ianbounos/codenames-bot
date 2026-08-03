@@ -221,8 +221,5 @@ class SpymasterBot:
 
     @staticmethod
     def _viola_regla_substring(candidata: str, palabras_tablero: set[str]) -> bool:
-        c = candidata.lower()
-        for palabra in palabras_tablero:
-            if c in palabra or palabra in c:
-                return True
-        return False
+        from engine.lemmatizador import viola_regla_palabra_relacionada
+        return viola_regla_palabra_relacionada(candidata, palabras_tablero)
