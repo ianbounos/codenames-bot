@@ -135,9 +135,11 @@ def _llamar_gemini(prompt: str, modelo: str = MODELO_DEFAULT, timeout: int = 30)
     if resp.status_code != 200:
         if VERBOSE:
             print(f"  [Gemini ERROR {resp.status_code}]: {resp.text[:300]}")
-        if resp.status_code == 429:
+        if resp.status_code in (429, 503):
             # Backoff: esperamos bastante más antes de que el próximo
-            # reintento del loop llamador vuelva a golpear la API
+            # reintento del loop llamador vuelva a golpear la API.
+            # 429 = límite de velocidad, 503 = servidor momentáneamente
+            # saturado -- ambos suelen resolverse solos en unos segundos.
             time.sleep(15.0)
         resp.raise_for_status()
 
